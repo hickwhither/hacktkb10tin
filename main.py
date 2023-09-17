@@ -27,8 +27,7 @@ class MyBot(commands.Bot):
                     print(f'❌ Error {files}: {e}')
 
     async def on_ready(self):
-        await self.tree.sync(guild = Object(944606508644204546))
-        await self.tree.sync(guild = Object(941346099011133440))
+        await self.tree.sync()
         print(f'=== Logged as {self.user} ({self.user.id}) ===')
     
 

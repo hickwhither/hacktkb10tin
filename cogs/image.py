@@ -91,7 +91,6 @@ class ImageCog(commands.Cog):
         await ctx.reply(file=discord.File(fp=buffer, filename = 'image.png'))
     
     @hybrid_command(name = 'tkb')
-    @app_commands.guilds(944606508644204546,944846595718004787)
     async def tkb(self, ctx :Context, idclass: Optional[str]):
         img = Image.open('./images/formattkb.png')
         draw = ImageDraw.Draw(img)
