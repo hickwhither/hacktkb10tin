@@ -1,6 +1,6 @@
 discord
 bs4
 beautifulsoup4
-Pillow
+Pillow==9.5.0
 aiohttp
 requests

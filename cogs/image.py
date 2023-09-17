@@ -100,7 +100,7 @@ class ImageCog(commands.Cog):
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('arial.ttf', 15, encoding = 'utf-8')
         m = []
-        addedtable = ''
+        dating = ''
         for _ in idclass.split():
             _ = _.upper()
             if _ not in classid or _ in m: continue
@@ -109,10 +109,10 @@ class ImageCog(commands.Cog):
                 for j, v in enumerate(v):
                     if v and v!='`': draw.text((110+j*154,33+i*22), v, fill = 'black', font = font)
             m.append(_)
-            addedtable = date
+            dating = date
 
         buffer = io.BytesIO()
         img.save(buffer, 'png')
         buffer.seek(0)
-
-        await ctx.reply(content = date, file=discord.File(fp=buffer, filename = 'image.png'))
+        if dating == '': await ctx.reply(content = "Vui lòng nhập id tkb!")
+        else: await ctx.reply(content = dating, file=discord.File(fp=buffer, filename = 'image.png'))

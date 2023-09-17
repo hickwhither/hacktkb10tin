@@ -6,15 +6,17 @@ import dotenv
 
 env = dotenv.dotenv_values('config.env')
 
+with open("owners.txt","r") as f: owners_ids = list(int(i) for i in f.read().split())
+
 class MyBot(commands.Bot):
 
     def __init__(self):
         self.env = dotenv.dotenv_values('config.env')
         super().__init__(
-            command_prefix = 'w.',
+            command_prefix = env['COMMAND_PREFIX'],
             intents = discord.Intents.all(),
             application_id = env['APPLICATION_ID'],
-            
+            owner_ids = owners_ids,
         )
 
     async def setup_hook(self):
