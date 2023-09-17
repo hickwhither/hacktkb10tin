@@ -36,14 +36,18 @@ class ImageCog(commands.Cog):
         self.bot = bot
 
     
-    def getclass(self, id:str):
+    def getclass(self, idname:str):
         for i,v in enumerate(classid):
-            if v==id:
+            if v==idname:
                 id = i
                 break
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         r = requests.get(f"http://thptchuyennguyentatthanh.kontum.edu.vn/TKB/tkb_2bclass_{id}.html", headers=headers)
         block = BeautifulSoup(r.content.decode(), "html.parser")
+
+        t = block.text.find('TKB có tác dụng từ:')
+        date = block.text[t:t+30]
+
         space = 12
         result = ''
         table = []
@@ -59,7 +63,7 @@ class ImageCog(commands.Cog):
                 # space = max(space,len(td.text))
                 # result += td.text + ' '*(space-len(td.text))
             table.append(row)
-        return table
+        return date, table
 
     
     @commands.command()
@@ -91,22 +95,24 @@ class ImageCog(commands.Cog):
         await ctx.reply(file=discord.File(fp=buffer, filename = 'image.png'))
     
     @hybrid_command(name = 'tkb')
-    async def tkb(self, ctx :Context, idclass: Optional[str]):
+    async def tkb(self, ctx :Context, *, idclass):
         img = Image.open('./images/formattkb.png')
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('arial.ttf', 15, encoding = 'utf-8')
         m = []
+        addedtable = ''
         for _ in idclass.split():
             _ = _.upper()
             if _ not in classid or _ in m: continue
-            table = self.getclass(_)
+            date, table = self.getclass(_)
             for i, v in enumerate(table):
                 for j, v in enumerate(v):
                     if v and v!='`': draw.text((110+j*154,33+i*22), v, fill = 'black', font = font)
             m.append(_)
+            addedtable = date
 
         buffer = io.BytesIO()
         img.save(buffer, 'png')
         buffer.seek(0)
 
-        await ctx.reply(file=discord.File(fp=buffer, filename = 'image.png'))
+        await ctx.reply(content = date, file=discord.File(fp=buffer, filename = 'image.png'))
