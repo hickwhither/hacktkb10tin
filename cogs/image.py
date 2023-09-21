@@ -23,7 +23,10 @@ PATTERNS = {
         r'[ỳýỷỹỵ]': 'y'
     }
 
-with open("./images/classid.txt", "r") as f: classid = f.read().split()
+with open("./images/classid.txt", "r") as f:
+    classid = f.read().split()
+with open("./images/tohop.txt", "r") as f:
+    tohop = dict((i.split(':')[0],i.split(':')[1].split()) for i in f.read().split('\n'))
 
 def no_accent_vietnamese(s):
         for pattern, replace in PATTERNS.items():
@@ -46,7 +49,7 @@ class ImageCog(commands.Cog):
         block = BeautifulSoup(r.content.decode(), "html.parser")
 
         t = block.text.find('TKB có tác dụng từ:')
-        date = block.text[t:t+30]
+        date = block.text[t+20:t+30]
 
         space = 12
         result = ''
@@ -66,7 +69,7 @@ class ImageCog(commands.Cog):
         return date, table
 
     
-    @commands.command()
+    @commands.command(help='Tạo giấy chứng nhận cho bạn =)')
     # @commands.cooldown(1, 300, commands.BucketType.user)
     async def deptrai(self, ctx, *, msg: str):
         await ctx.typing()
@@ -94,14 +97,13 @@ class ImageCog(commands.Cog):
 
         await ctx.reply(file=discord.File(fp=buffer, filename = 'image.png'))
     
-    @hybrid_command(name = 'tkb')
-    async def tkb(self, ctx :Context, *, idclass):
+    def drawtkb(self, idclass):
         img = Image.open('./images/formattkb.png')
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('arial.ttf', 15, encoding = 'utf-8')
         m = []
         dating = ''
-        for _ in idclass.split():
+        for _ in idclass:
             _ = _.upper()
             if _ not in classid or _ in m: continue
             date, table = self.getclass(_)
@@ -110,9 +112,24 @@ class ImageCog(commands.Cog):
                     if v and v!='`': draw.text((110+j*154,33+i*22), v, fill = 'black', font = font)
             m.append(_)
             dating = date
-
         buffer = io.BytesIO()
         img.save(buffer, 'png')
         buffer.seek(0)
-        if dating == '': await ctx.reply(content = "Vui lòng nhập id tkb!")
-        else: await ctx.reply(content = dating, file=discord.File(fp=buffer, filename = 'image.png'))
+        return dating, buffer
+
+    @hybrid_command(name = 'tkb', help='Lấy tkb theo id lớp')
+    async def tkb(self, ctx :Context, *, idclass):
+        dating, buffer = self.draw(idclass.split())
+        if dating == '':
+            return await ctx.reply(content = "Vui lòng nhập id tkb!")
+        await ctx.reply(content = f'TKB có tác dụng từ ngày: {dating}',
+                        file=discord.File(fp=buffer, filename = f'{dating.replace("/","_")}.png'))
+    
+    @hybrid_command(name = 'tohop', help='Lấy tkb theo tổ hợp của bạn (lớp 10)')
+    async def tohop(self, ctx:Context, idtohop: str):
+        idtohop = idtohop.upper()
+        if idtohop not in tohop:
+            return await ctx.reply(content='Tổ hợp không phù hợp..')
+        dating, buffer = self.drawtkb(tohop[idtohop])
+        await ctx.reply(content = f'TKB có tác dụng từ ngày: {dating}',
+                        file=discord.File(fp=buffer, filename = f'{dating.replace("/","_")}.png'))

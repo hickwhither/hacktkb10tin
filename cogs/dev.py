@@ -11,8 +11,15 @@ class Developer(commands.Cog):
         self.bot = bot
 
 
+    @commands.command()
+    async def uptime(self, ctx):
+        await ctx.reply(embed=Embed(
+            title = "Uptime ⌚",
+            description=f'Hoạt động từ: {self.bot.uptime}\nSố lần dùng lệnh: {self.bot.usecount}'
+        ), mention_author = False)
+
     @commands.command(aliases = ['rl','yell'])
-    # @commands.is_owner()
+    @commands.is_owner()
     async def reload(self, ctx: commands.Context, *, exts: str = ''):
         # async with ctx... dài hơn
         await ctx.typing()
@@ -44,7 +51,7 @@ class Developer(commands.Cog):
                 else:
                     content += f'\✅ `{file}.py`\n'
 
-        await ctx.reply(content)
+        await ctx.reply(content, mention_author = False)
     
 
     
