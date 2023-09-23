@@ -119,7 +119,7 @@ class ImageCog(commands.Cog):
 
     @hybrid_command(name = 'tkb', help='Lấy tkb theo id lớp')
     async def tkb(self, ctx :Context, *, idclass):
-        dating, buffer = self.draw(idclass.split())
+        dating, buffer = self.drawtkb(idclass.split())
         if dating == '':
             return await ctx.reply(content = "Vui lòng nhập id tkb!")
         await ctx.reply(content = f'TKB có tác dụng từ ngày: {dating}',
