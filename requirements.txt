@@ -4,3 +4,4 @@ beautifulsoup4
 Pillow==9.5.0
 aiohttp
 requests
+python-dotenv
